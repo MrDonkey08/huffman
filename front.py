@@ -1,21 +1,21 @@
 ###################HUFFMAN_FRONT###################
-### Rivera Reos Fernando de Jesus, UdeG, Cucei ####
+### Rivera Reos Fernando de Jesús, UdeG, Cucei ####
 ###################################################
 
 ###########LIBRERIAS##############
 import tkinter as tk
-from tkinter import filedialog  #Modulo para explorar y leer archivos
-import collections              #Modulo para crear de manera mas dinamica y sencilla la lista de frecuencia
+from tkinter import filedialog  #Módulo para explorar y leer archivos
+from collections import Counter #Módulo para crear de manera mas dinamica y sencilla la lista de frecuencia
 
-############FUNCIONES#############
-def openFile():                                    #Funcion para leer el archivo y leer su frecuencia de caracteres
+############Funciones#############
+def openFile():                                     #Función para leer el archivo y leer su frecuencia de caracteres
 
     filePath = filedialog.askopenfilename()         #Recupera y guarda la ruta del archivo
     if filePath:                                    #Revisa que esta ruta sea de un archivo existente
         file = open(filePath, 'r')                  #Abre el archivo y guarda el objeto del mismo
         content = file.read()                       #Guarda el contenido del archivo en forma de string
         file.close()                                #Cierra el archivo
-        charFreq = collections.Counter(content)     #Counter, se encarga de contar la frecuencia de caracteres del string content
+        charFreq = Counter(content)                 #Counter, se encarga de contar la frecuencia de caracteres del string content
         frequencyListbox.delete(0, tk.END)          #Limpia la listbox de la ventana, en caso de que tenga contenido no deseado
         
         #Se imprime la frecuencia en la listbox de la ventana
