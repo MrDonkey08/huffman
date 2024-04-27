@@ -3,6 +3,7 @@
 ###################################################
 
 ###########LIBRERIAS##############
+import os
 import tkinter as tk
 from tkinter import filedialog  #Módulo para explorar y leer archivos
 from collections import Counter #Módulo para crear de manera mas dinamica y sencilla la lista de frecuencia
@@ -32,15 +33,39 @@ def openFile():                                     #Función para leer el archi
 
         charFreq = list(charFreq.items()) # Lista de Tuplas
 
-def huffman_tree():
-    global charFreq
+
+def comprimir():
+    global charFreq, filePath
 
     node = make_tree(charFreq)
     encoding = code_tree(node)
-    for i in encoding:
-        print(f"{i} : {encoding[i]}")
 
-    return encoding
+    if filePath:
+        dir_path = os.path.dirname(filePath) # Ruta de la carpeta del archivo
+        # file_name es nombre del archivo (sin extensión)
+        file_name, file_extension = os.path.splitext(os.path.basename(filePath))  
+
+        # Ruta del archivo sin la extensión del archivo
+        file_path_extensionless = os.path.join(dir_path, file_name)
+        # Ruta del archivo binario a generar (misma carpeta que el arhivo elegido)
+        file_path_bin = file_path_extensionless + ".bin"
+
+        # Intertar extensión del archivo y datos para regenerar el árbol de huffman
+        with open(file_path_bin, "w") as wf:
+            # Extensión del archivo
+            wf.write(file_extension)
+            wf.write('\n')
+            # Caracteres del texto (del más frecuente al menos)
+            for i in charFreq:
+                wf.write(i[0])
+            wf.write('\n')
+            # Número de incidencias (del mayor al menor)
+            for i in charFreq:
+                wf.write(str(i[1]))
+                wf.write('\t') # Tab como separador
+            wf.write('\n')
+    else:
+        print("Abre un archivo")
 
 #############VENTANA#############
 
@@ -55,7 +80,7 @@ buttonFrame.pack(pady=10)
 examineButton = tk.Button(buttonFrame, text="Examinar", command=openFile)
 examineButton.grid(row=0, column=0, padx=10)
 #Boton para mandar a comprimir
-compressButton = tk.Button(buttonFrame, text="Comprimir", command=huffman_tree)
+compressButton = tk.Button(buttonFrame, text="Comprimir", command=comprimir)
 compressButton.grid(row=0, column=1, padx=10)
 #Boton para descomprimir
 decompressButton = tk.Button(buttonFrame, text="Descomprimir")
