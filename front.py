@@ -83,11 +83,10 @@ def comprimir():
 def data_compression(file, file_bin, encoding):
     # Número de carácteres
     n_char = sum(count for _, count in charFreq)
-    n_char_cos = n_char // 8 # Número de Bytes
-    n_char_res = n_char % 8 # Número de Bits
+    bits = n_char % 8 # Número de Bits que no completan un Byte
 
     rchar = True
-    code = ''
+    codes = ''
 
     # Lee el archivo, codifica su contenido y lo guarda en `code`
     with open(file, "r") as rf:
@@ -95,45 +94,20 @@ def data_compression(file, file_bin, encoding):
             rchar = rf.read(1)
             for i in encoding:
                 if rchar == i:
-                    code += encoding[i]
+                    codes += encoding[i]
                     break
 
-    beg = 0
-    end = 8
-    n_char_prod = n_char_cos * 8
-
+    aux = ''
     # Inserción de contenido codificado en el archivo .bin
     with open(file_bin, 'ab') as af:
-        for i in range(n_char_cos):
-            aux = ''
-            for j in range(beg, end):
-                aux += code[j]
+        for i in codes:
+            aux += i
 
-            bv = BitVector(bitstring = aux)
-            bv.write_to_file(af)
+            if len(aux) % 8 == 0:
+                bv = BitVector(bitstring = aux)
+                bv.write_to_file(af)
+                aux = ''
 
-            beg += 8
-            end += 8
-
-        # Inserción de los últimos bits, en caso de haber byte imcompleto
-        if n_char_res > 0:
-            aux = ''
-
-            for i in range(n_char_res):
-                aux += code[n_char_cos + i]
-
-            # Completando el último byte con ceros
-            for i in range(8 - n_char_res):
-                aux += '0'
-
-            bv = BitVector(bitstring = aux)
-            bv.write_to_file(af)
-            af.write(b"\n")
-
-            '''# Guardando la cantidad de ceros agredados
-            trash = str(8 - n_char_res)
-            af.write(trash.encode('utf-8'))'''
-    
     print("Archivo comprimido")
 
 def descomprimir():
@@ -154,12 +128,14 @@ def descomprimir():
                 line = rf.readline()
                 bits = ''
 
+                # Guardando los bits (ceros y unos) en str
                 while line:
                     bits += ''.join(format(byte, '08b') for byte in line)
                     line = rf.readline()
 
                 code = ''
 
+                # Decodificando los bits en carácteres
                 for bit in bits:
                     for i in encoding:
                         if code == encoding[i]:
@@ -169,15 +145,14 @@ def descomprimir():
                     
                     code += bit
 
-
     print("Descomprimido")
-        
+
+
 def get_tree_data(file, char_freq):
     if file:
         dir_path, file_name, file_extension, file_path_extensionless = get_extensions(filePath)
 
         charFreq = []
-        rchar = True
         codes = []
 
         with open(filePath, 'rb') as rf:
@@ -198,9 +173,6 @@ def get_tree_data(file, char_freq):
         new_file = file_path_extensionless + new_ext
 
     return new_file, char_freq
-
-    
-
 
 #############VENTANA#############
 
