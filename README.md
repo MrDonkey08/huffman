@@ -28,7 +28,7 @@ Este algoritmo consiste en:
 
 2. Organizar el conteo de los bytes descendentemente mayor a menor.
 
-3. Hacer un _árbol binario completo_ (exceptuando al último nivel) en el que el _nodo raíz_ y cada _nodo hoja_ (con valor 1) sea una referencia a un byte y que los _nodos padres_ (el resto de nodos) tengan valor 0.
+3. Generar el árbol binario de Huffman empezando desde abajo hacia arriba.
 
 > [!IMPORTANT]
 >
@@ -50,18 +50,18 @@ Este algoritmo consiste en:
 
 ### Objetivos Generales
 
-- [ ] Desarrollar el algoritmo de codificación/compresión de Huffman para la compresión de archivos en python.
+- [x] Desarrollar el algoritmo de codificación/compresión de Huffman para la compresión de archivos en python.
 
 ### Objetivos Especificos
 
 - [x] Desarrollar una interfaz gráfica en la que existan 3 botones:
-	- [x] **Abrir archivo**: Deberá permitir al usuario escoger el archivo a comprimir.
-	- [x] **Comprimir archivo**: 
-		- [x] Hará el conteo de cada uno de los bytes, generará una lista y la imprimirá.
-		- [x] Construirá el árbol de huffman a partir de la lista generada.
-	- [x] **Descomprimir archivo**:
-		- [x] Seleccionar el archivo a descomprimir.
-		- [x] Generar archivo descomprimido.
+  - [x] **Abrir archivo**: Deberá permitir al usuario escoger el archivo a comprimir.
+  - [x] **Comprimir archivo**:
+    - [x] Hará el conteo de cada uno de los bytes, generará una lista y la imprimirá.
+    - [x] Construirá el árbol de huffman a partir de la lista generada.
+  - [x] **Descomprimir archivo**:
+    - [x] Seleccionar el archivo a descomprimir.
+    - [x] Generar archivo descomprimido.
 
 ## Desarrollo
 
@@ -71,26 +71,41 @@ Este algoritmo consiste en:
 
 Desarrollé las siguientes funciones:
 
-- `select_file()`: Despliega un gestor de archivos para que el usuario seleccione un archivo a comprimir y lo guarda en la variable global `archivo`
+- `openFile`: Despliega un gestor de archivos para que el usuario seleccione un archivo y lo guarda en la variable global `filePath`.
 
-- `count_char(file)`: Cuenta cada una de las instancias de cada byte/carácter del archivo. Guarda el conteo en el diccionario `chars`, teniendo como _key_ el conteo y como _value_ el conteo. Regresa como valor el diccionario ordenado descendentemente.
-
-- `compress()`: En `chars` guada el valor retornado por la función `count_char(file)`. Imprime cada carácter con su número de instancias 
-
-- `gui()`: Genera una ventana con los botones:
-	- `Select File`: Ejecuta la función `select_file()`
-	- `Compress`: Ejecuta la función `compress()`
-	- `Decompress`. Ejecuta la función `decompress()`
-	- `Quit`: Cierra la ventana principal.
-
+- `count_chars()`: Cuenta cada una de las instancias de cada byte/carácter del archivo. Guarda el conteo en el _counter_ `chars`, teniendo como _key_ el conteo y como _value_ el conteo; lo ordena descendentemente y lo convierte en una lista de tuplas y lo guarda en la variable global `charFreq`.
 
 #### Backend
+
+##### huffman.py
+
+Desarrollé la clase `NordTree` la cual simplemente establece el nodo izquierdo o derecho de un árbol (o subárbol) y además como método regresa cada uno de estos nodos.
+
+Desarrollé las siguientes funciones:
+
+- `code_tree(node, binString='')`: Se encarga de generar los códigos para cada uno de los nodos, de los carácteres.
+
+`make_tree(nodes)`: Se encarga de generar el árbol de Huffman. Regresa la raíz del árbol
+
+##### frontend.py
+
+- `comprimir()`: Usa la función `count_chars` para después con ayuda de `make_tree()` y `code_tree()` generar el árbol y los códigos respectivamente, luego guarda los datos para regenerar estos dos datos en el archivo .bin y por último utiliza la función `data_compression`.
+
+- `data_compression(filePath, file_bin, encoding)`: Añade al archivo .bin cada uno de los caracteres del archivo original, codificados con el árbol de Huffman.
+
+- `get_extensions`: Función auxiliar que sirve para renombrar el arhivo a comprimir o descomprimir con la extensión adecuada.
+
+- `get_tree_data(file, char_freq)`: Extrae del archivo .bin los valores necesarios para regenerar el árbol de Huffman. Regresa estos valores.
+
+- `descomprimir()`: Utiliza la función `get_tree_data()` para obtener la frecuencia de carácteres y la extensión del archivo. Después, al igual que `compresión`, genera el árbol de Huffman, extra el contenido del archivo .bin y lo decodifica haciendo uso de los códigos generados a través del árbol de Huffman.
 
 ## Conclusión
 
 En retrospectiva los **algoritmos voraces** permiten resolver un problema tomando la mejor opción disponible en el momento. Estos algoritmos son muy importantes debido a que permiten establecer soluciones a problemas que son imposible o muy difíciles de abordar para conseguir la mejor respuesta.
 
 La codificación de huffman resuelve uno de los principales problemas en la actualidad, el reducir el tamaño de los archivos sin pérdida de información. Este algoritmo también permite reducir el costo de envio de paquetes a través de redes, compriéndolo al enviarlo y descomprimiendo al ser recibido.
+
+Respecto al trabajo de un proyecto ajeno, se me hizo una experiencia muy interesante ya que me permitió ver la manera en que trabaja otro desarrollador, el ver cómo colaborar a un proyecto, aprender a interpretar el código y a adaptarme a la implementación de otro desarrollador. Fue una experiencia muy interesante, divertida, pero agotadora.
 
 Por último, es importante mencionar que este es un algoritmo voraz debido que no existe una manera perfecta de comprimir datos, pero este toma la mejor opción posible para la compresión. Divide el problema en subproblemas al resolver la compresión del archivo al trabajar con cada uno de los bytes. Y una que ha sido codificado un byte, este no puede ser revertido
 
@@ -99,3 +114,5 @@ Por último, es importante mencionar que este es un algoritmo voraz debido que n
 - [Vega, F.](https://platzi.com/profes/freddier/) (marzo 16, 2017). _Cómo funciona .zip: Árboles binarios_. Platzi. https://platzi.com/new-home/clases/1098-ingenieria/6574-como-funciona-zip-arboles-binarios/
 
 - Programmiz (s. f.). _Huffman Coding_. https://www.programiz.com/dsa/huffman-coding
+
+- Reducible (julio, 29, 2021). _Huffman Codes: An Information Theory Perspective_. https://odysee.com/@Reducible:8/huffman-codes-an-information-theory
